@@ -1,7 +1,5 @@
 import webapp2
 import os
-from google.appengine.ext import ndb
-from loaddata import load
 import csv
 import jinja2
 
@@ -9,19 +7,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.join(os.path.dirname(__file__), 'html')),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
-	
-class Asxdata(ndb.Model):
-    """Sub model for representing an stock price entry."""
-    code = ndb.StringProperty()
-    date = ndb.StringProperty()
-    open = ndb.StringProperty(indexed=False)
-    high = ndb.StringProperty(indexed=False)
-    low = ndb.StringProperty(indexed=False)
-    close = ndb.StringProperty(indexed=False)
-    volume = ndb.StringProperty(indexed=False)
-
-	
-	
+		
 class MainPage(webapp2.RequestHandler):
     def get(self):
         template_head = JINJA_ENVIRONMENT.get_template('header.html')
@@ -41,8 +27,9 @@ class MainPage(webapp2.RequestHandler):
         template_table = JINJA_ENVIRONMENT.get_template('body_table.html')
         template_error = JINJA_ENVIRONMENT.get_template('body_error.html')
         # Get query code and date (reformat)		
-        querycode = str(self.request.get('code'))
+        querycode = str(self.request.get('code')).upper()
         querydate = self.request.get('date')[0:-6] + self.request.get('date')[5:-3] + self.request.get('date')[8:]
+        queryyear = self.request.get('date')[0:-6]
         # Render HTML header including query components		 
         template_values = {
             'querycode': self.request.get('code'),			
@@ -56,13 +43,16 @@ class MainPage(webapp2.RequestHandler):
         if len(querydate) < 8:	
             iserror = True
             error_message = error_message + "Please select a date."
+        if int(queryyear) < 1997 or int(queryyear) > 2014:
+            iserror = True
+            error_message = error_message + "Please select a date between 1997 and 2014"			
         if iserror == False:		
         # Query from file
             queryfile = querydate + '.txt'
-            for filename in os.listdir(os.path.join(os.path.dirname(__file__),'loaddata')):
+            for filename in os.listdir(os.path.join(os.path.dirname(__file__),'loaddata', queryyear)):
                 if filename.endswith(queryfile):
                     filefound = True
-                    inputfile = os.path.join(os.path.dirname(__file__), 'loaddata', queryfile)
+                    inputfile = os.path.join(os.path.dirname(__file__), 'loaddata', queryyear, queryfile)
                     reader = csv.reader(open(inputfile, 'rb'), delimiter=',', quotechar='"')
                     for row in reader:
                         if row[0] == querycode:
@@ -82,7 +72,7 @@ class MainPage(webapp2.RequestHandler):
                 error_message = "ASX code not found at this date"	
             if filefound == False:
                 iserror = True
-                error_message = "No data found for this date"					
+                error_message = "No data found for this date. Check it isn't the weekend or outside source data range"					
         if iserror == True:	
         # Create error message
             template_values = {
@@ -94,5 +84,4 @@ class MainPage(webapp2.RequestHandler):
 			
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/load', load.LoadStocks),	
 ], debug=True)
