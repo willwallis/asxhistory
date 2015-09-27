@@ -1,0 +1,32 @@
+application: asxhistory
+version: 2
+runtime: python27
+api_version: 1
+threadsafe: yes
+  
+handlers:
+- url: /favicon\.ico
+  static_files: favicon.ico
+  upload: favicon\.ico
+
+- url: /css
+  static_dir: html/css
+ 
+- url: /js
+  static_dir: /html/js
+
+- url: /fonts
+  static_dir: /html/fonts
+  
+- url: .*
+  script: main.app
+    
+- url: /load/.*
+  script: main.app
+  login: admin
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest

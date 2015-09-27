@@ -1,0 +1,33 @@
+
+    <div class="container">
+	    
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">ASX Price</div>
+
+		<!-- Table -->
+		<table class="table">
+			<tr><td>Code</td>
+			<td>{{code}}</td></tr>
+			<tr><td>Date</td>
+			<td>{{date}}</td></tr>
+			<tr><td>Open</td>
+			<td>{{open}}</td></tr>
+			<tr><td>High</td>
+			<td>{{high}}</td></tr>
+			<tr><td>Low</td>
+			<td>{{low}}</td></tr>
+			<tr><td>Close</td>
+			<td>{{close}}</td></tr>
+			<tr><td>Volume</td>
+			<td>{{volume}}</td></tr>
+			</table>
+	</div>
+
+    </div><!-- /.container -->
+	
+	
+    <div class="container">
+	<a href="https://www.google.com/finance?q=ASX.{{code}}" target="_blank">Link to Google Charts</a> </br>
+	<a href="http://hfgapps.hubb.com/asxtools/Charts.aspx?asxCode={{code}}&compare=comp_index&indicies=0&pma1=0&pma2=0&volumeInd=9&vma=0&TimeFrame=M10" target="_blank">Link to ASX Charts</a>
+	    </div><!-- /.container -->
